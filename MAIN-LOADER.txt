@@ -12,13 +12,45 @@ local scripts = {
         name = "PNB BOTHAX V2.1",
         configPath = "PNB-SETTING.json",
         mainURL = "https://raw.githubusercontent.com/deyde22/DeydeHere-MAIN-SC/refs/heads/main/PNB%20V2.1%20NEW",
-        whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PNB%202.1.txt"
+        whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PNB%202.1.txt",
+        useRedirect = true
     },
     {
         name = "PTHT BOTHAX V2.1",
         configPath = "PTHT-SETTING.json",
         mainURL = "https://raw.githubusercontent.com/deyde22/DeydeHere-MAIN-SC/refs/heads/main/PTHT%20V2.1%20NEWs",
-        whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PTHT%202.1.txt"
+        whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PTHT%202.1.txt",
+        useRedirect = true
+    },
+    {
+        name = "COOKING SCRIPT",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/AkuMahPemula%5BCOOK%5D.lua",
+        useRedirect = false
+    },
+    {
+        name = "WTW MOVE",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/AkuMahMasihPemula%5BWTW%5D.lua",
+        useRedirect = false
+    },
+    {
+        name = "SPTHT (NOT READY YET)",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/SPTHT-GG.lua",
+        useRedirect = false
+    },
+    {
+        name = "SB PROXY",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/SB-kayanya.luau",
+        useRedirect = false
+    },
+    {
+        name = "PROXY IKAN",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/ProxyIkan.txt",
+        useRedirect = false
+    },
+    {
+        name = "PUSH DAILY",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/GUILDLODER.lua.txt",
+        useRedirect = false
     }
 }
 
@@ -43,7 +75,9 @@ local function loadScript(scriptIndex)
         ConfigPath = script.configPath
         Android, Windows = true, true
         
-        setupHook(script.whitelistNew)
+        if script.useRedirect then
+            setupHook(script.whitelistNew)
+        end
         
         local res = MakeRequest(script.mainURL, "GET", nil, nil, 10000)
         
@@ -60,11 +94,15 @@ local function loadScript(scriptIndex)
             return
         end
         
-        content = tostring(content):gsub("deyde22/Deydehere%-VIP%-SC", "PrivateStranger/Justathing")
-        content = tostring(content):gsub("deyde22%%2FDeydehere%-VIP%-SC", "PrivateStranger%%2FJustathing")
-        
-        if content:find("PrivateStranger") then
-            LogToConsole("Link replacement successful")
+        if script.useRedirect then
+            content = tostring(content):gsub("deyde22/Deydehere%-VIP%-SC", "PrivateStranger/Justathing")
+            content = tostring(content):gsub("deyde22%%2FDeydehere%-VIP%-SC", "PrivateStranger%%2FJustathing")
+            
+            if content:find("PrivateStranger") then
+                LogToConsole("Link replacement successful")
+            end
+        else
+            LogToConsole("Direct load - no redirection")
         end
         
         local f, compileErr = load(content)
@@ -85,7 +123,7 @@ end
 function LoaderOnDraw()
     if not showMenu then return end
     
-    ImGui.SetNextWindowSize(ImVec2(400, 300), ImGui.Cond.FirstUseEver)
+    ImGui.SetNextWindowSize(ImVec2(400, 350), ImGui.Cond.FirstUseEver)
     local flags = ImGui.WindowFlags.NoCollapse + ImGui.WindowFlags.NoResize + ImGui.WindowFlags.AlwaysAutoResize
     ImGui.Begin("SANG PENAKLUK MATAHARI", flags)
     
