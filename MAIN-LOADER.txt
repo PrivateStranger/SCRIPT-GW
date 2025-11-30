@@ -1,0 +1,131 @@
+---------------------------------------------
+-- SANG PENAKLUK MATAHARI
+-- UNIVERSAL LOADER V2.1
+-- TURN ON IO, OS, MAKEREQUEST, IMGUI
+---------------------------------------------
+
+local showMenu = true
+local selectedScript = 0
+
+local scripts = {
+    {
+        name = "PNB BOTHAX V2.1",
+        configPath = "PNB-SETTING.json",
+        mainURL = "https://raw.githubusercontent.com/deyde22/DeydeHere-MAIN-SC/refs/heads/main/PNB%20V2.1%20NEW",
+        whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PNB%202.1.txt"
+    },
+    {
+        name = "PTHT BOTHAX V2.1",
+        configPath = "PTHT-SETTING.json",
+        mainURL = "https://raw.githubusercontent.com/deyde22/DeydeHere-MAIN-SC/refs/heads/main/PTHT%20V2.1%20NEWs",
+        whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PTHT%202.1.txt"
+    }
+}
+
+local loader_hook_name = "SANG_PENAKLUK_MATAHARI_LOADER"
+
+local function setupHook(whitelistURL)
+    local oldMakeRequest = MakeRequest
+    function MakeRequest(url, ...)
+        if type(url) == "string" and (url:find("deyde22/Deydehere%-VIP%-SC") or url:find("deyde22%%2FDeydehere%-VIP%-SC")) then
+            LogToConsole("Whitelist redirected to custom URL")
+            return oldMakeRequest(whitelistURL, ...)
+        end
+        return oldMakeRequest(url, ...)
+    end
+end
+
+local function loadScript(scriptIndex)
+    RemoveHook(loader_hook_name)
+    
+    RunThread(function()
+        local script = scripts[scriptIndex]
+        ConfigPath = script.configPath
+        Android, Windows = true, true
+        
+        setupHook(script.whitelistNew)
+        
+        local res = MakeRequest(script.mainURL, "GET", nil, nil, 10000)
+        
+        if not res then
+            LogToConsole("MakeRequest returned nil (no connection or blocked)")
+            return
+        end
+        
+        LogToConsole("HTTP status: " .. tostring(res.status) .. "  err: " .. tostring(res.error))
+        
+        local content = res.content or res
+        if not content or #tostring(content) == 0 then
+            LogToConsole("Content kosong.")
+            return
+        end
+        
+        content = tostring(content):gsub("deyde22/Deydehere%-VIP%-SC", "PrivateStranger/Justathing")
+        content = tostring(content):gsub("deyde22%%2FDeydehere%-VIP%-SC", "PrivateStranger%%2FJustathing")
+        
+        if content:find("PrivateStranger") then
+            LogToConsole("Link replacement successful")
+        end
+        
+        local f, compileErr = load(content)
+        if not f then
+            LogToConsole("Compile error: " .. tostring(compileErr))
+            return
+        end
+        
+        local ok, runtimeErr = pcall(f)
+        if not ok then
+            LogToConsole("Runtime error: " .. tostring(runtimeErr))
+        else
+            LogToConsole("Script successfully executed.")
+        end
+    end)
+end
+
+function LoaderOnDraw()
+    if not showMenu then return end
+    
+    ImGui.SetNextWindowSize(ImVec2(400, 300), ImGui.Cond.FirstUseEver)
+    local flags = ImGui.WindowFlags.NoCollapse + ImGui.WindowFlags.NoResize + ImGui.WindowFlags.AlwaysAutoResize
+    ImGui.Begin("SANG PENAKLUK MATAHARI", flags)
+    
+    ImGui.Separator()
+    ImGui.Text("Select Script to Load:")
+    ImGui.Separator()
+    
+    for i, script in ipairs(scripts) do
+        if ImGui.RadioButton(script.name, selectedScript == i) then
+            selectedScript = i
+        end
+    end
+    
+    ImGui.Separator()
+    
+    local script_to_run = nil
+    if selectedScript > 0 then
+        script_to_run = scripts[selectedScript]
+    end
+    
+    if not script_to_run then
+        ImGui.PushStyleColor(ImGui.Col.Button, ImVec4(0.5, 0.5, 0.5, 1.0))
+        ImGui.PushStyleColor(ImGui.Col.ButtonHovered, ImVec4(0.5, 0.5, 0.5, 1.0))
+        ImGui.PushStyleColor(ImGui.Col.ButtonActive, ImVec4(0.5, 0.5, 0.5, 1.0))
+    end
+    
+    if ImGui.Button("START SCRIPT", ImVec2(ImGui.GetContentRegionAvail().x, 40)) and script_to_run then
+        loadScript(selectedScript)
+        showMenu = false
+    end
+    
+    if not script_to_run then
+        ImGui.PopStyleColor(3)
+    end
+    
+    ImGui.Separator()
+    ImGui.TextColored(ImVec4(0.5, 0.5, 0.5, 1.0), "Custom Whitelist Loader v2.1")
+    
+    ImGui.End()
+end
+
+AddHook("OnDraw", loader_hook_name, LoaderOnDraw)
+LogToConsole("SANG PENAKLUK MATAHARI - Loader Ready")
