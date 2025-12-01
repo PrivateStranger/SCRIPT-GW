@@ -34,7 +34,7 @@ local scripts = {
     },
     {
         name = "SPTHT (NOT READY YET)",
-        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/SPTHT-IMGUI.lua",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/SPTHT-GG.lua",
         useRedirect = false
     },
     {
@@ -50,6 +50,21 @@ local scripts = {
     {
         name = "PUSH DAILY",
         mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/GUILDLODER.lua.txt",
+        useRedirect = false
+    },
+    {
+        name = "GRINDER SC",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/GRINDERSCMAHAL.lua",
+        useRedirect = false
+    },
+    { 
+        name = "PUT PLAT",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PutPlat.lua%20(2).txt",
+        useRedirect = false
+    },
+    {
+        name = "SURGERY ADVANCE"
+        mainURl = "COMING SOON"
         useRedirect = false
     }
 }
