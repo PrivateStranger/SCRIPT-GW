@@ -34,7 +34,7 @@ local scripts = {
     },
     {
         name = "SPTHT (NOT READY YET)",
-        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/SPTHT-GG.lua",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/SPTHT-IMGUI.lua",
         useRedirect = false
     },
     {
