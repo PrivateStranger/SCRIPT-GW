@@ -61,11 +61,6 @@ local scripts = {
         name = "PUT PLAT",
         mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PutPlat.lua%20(2).txt",
         useRedirect = false
-    },
-    {
-        name = "SURGERY ADVANCE"
-        mainURl = "COMING SOON"
-        useRedirect = false
     }
 }
 
