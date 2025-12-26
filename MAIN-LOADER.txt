@@ -66,26 +66,6 @@ local scripts = {
         name = "ROTASI SCRIPT",
         mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/Holidays.lua",
         useRedirect = false
-    },
-    {
-        name = "Ptht Rebana",
-        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PTHTREBENC.lua",
-        useRedirect = false
-    },
-    {
-        name = "PNB Rebana",
-        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PNBv3enc.lua",
-        useRedirect = false
-    },
-    {
-        name = "Geiger [REBANA]",
-        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/Geigerenc.lua",
-        useRedirect = false
-    },
-    {
-        name = "PROXY SB",
-        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/SB PROXYenc.lua",
-        useRedirect = false
     }
 }
 
