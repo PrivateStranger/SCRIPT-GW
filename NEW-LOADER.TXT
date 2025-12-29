@@ -72,10 +72,17 @@ local scripts = {
     },
     {
         name = "PNB V3 (ENCRYPTED)",
-        mainURL = "https://raw.githubusercontent.com/YOUR_REPO/YOUR_PATH/PNB v3_enc",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/main/PNBv3enc.lua",
         useRedirect = false,
         isEncrypted = true,
         encryptedFileName = "PNB v3_enc"
+    },
+    {
+        name = "PTHT V3 (ENCRYPTED)",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/main/PTHTREBENC.lua",
+        useRedirect = false,
+        isEncrypted = true,
+        encryptedFileName = "PTHT v3_enc"
     }
 }
 
