@@ -26,6 +26,14 @@ local scripts = {
         useRedirect = true
     },
     {
+        name = "PTHT V3 (ENCRYPTED)",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/main/PTHTREBENC.lua",
+        configPath = "PTHT-SETTING.json",
+        useRedirect = false,
+        isEncrypted = true,
+        encryptedFileName = "PTHT v3_enc"
+    },
+    {
         name = "COOKING SCRIPT",
         mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/AkuMahPemula%5BCOOK%5D.lua",
         useRedirect = false
@@ -73,16 +81,10 @@ local scripts = {
     {
         name = "PNB V3 (ENCRYPTED)",
         mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/main/PNBv3enc.lua",
+        configPath = "PNB-SETTING.json",
         useRedirect = false,
         isEncrypted = true,
         encryptedFileName = "PNB v3_enc"
-    },
-    {
-        name = "PTHT V3 (ENCRYPTED)",
-        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/main/PTHTREBENC.lua",
-        useRedirect = false,
-        isEncrypted = true,
-        encryptedFileName = "PTHT v3_enc"
     }
 }
 
@@ -141,8 +143,16 @@ local function loadScript(scriptIndex)
             
             -- Save to temp file
             local tempPath = script.encryptedFileName
-            WriteFile(tempPath, res.content)
-            table.insert(tempFiles, tempPath)  -- Track for cleanup
+            local file = io.open(tempPath, "wb")
+            if not file then
+                setStatus("Failed to create file!", ImVec4(1, 0, 0, 1))
+                isLoading = false
+                return
+            end
+            
+            file:write(res.content)
+            file:close()
+            table.insert(tempFiles, tempPath)
             
             -- Load encrypted file
             local ok, err = pcall(function()
@@ -152,7 +162,7 @@ local function loadScript(scriptIndex)
             if ok then
                 setStatus("Encrypted script loaded!", ImVec4(0, 1, 0, 1))
                 Sleep(1000)
-                cleanupTempFiles()  -- Delete after load
+                cleanupTempFiles()
                 Sleep(1000)
                 showMenu = false
             else
@@ -252,8 +262,8 @@ function LoaderOnDraw()
     end
     
     -- Start button
-    local script_to_run = selectedScript > 0 and scripts[selectedScript]
-    local buttonEnabled = script_to_run and not isLoading
+    local script_to_run = (selectedScript > 0) and scripts[selectedScript] or nil
+    local buttonEnabled = script_to_run ~= nil and not isLoading
     
     if not buttonEnabled then
         ImGui.PushStyleColor(ImGui.Col.Button, ImVec4(0.3, 0.3, 0.3, 1.0))
@@ -272,6 +282,9 @@ function LoaderOnDraw()
     ImGui.PopStyleColor(3)
     
     -- Close button
+    ImGui.Spacing()
+    ImGui.Spacing()
+    ImGui.Separator()
     ImGui.Spacing()
     if ImGui.Button("CLOSE LOADER", ImVec2(ImGui.GetContentRegionAvail().x, 30)) then
         showMenu = false
