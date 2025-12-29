@@ -1,0 +1,281 @@
+---------------------------------------------
+-- SANG PENAKLUK MATAHARI
+-- UNIVERSAL LOADER V2.2
+-- TURN ON IO, OS, MAKEREQUEST, IMGUI
+---------------------------------------------
+
+local showMenu = true
+local selectedScript = 0
+local isLoading = false
+local statusMessage = ""
+local statusColor = ImVec4(1, 1, 1, 1)
+
+local scripts = {
+    {
+        name = "PNB BOTHAX V2.1",
+        configPath = "PNB-SETTING.json",
+        mainURL = "https://raw.githubusercontent.com/deyde22/DeydeHere-MAIN-SC/refs/heads/main/PNB%20V2.1%20NEW",
+        whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PNB%202.1.txt",
+        useRedirect = true
+    },
+    {
+        name = "PTHT BOTHAX V2.1",
+        configPath = "PTHT-SETTING.json",
+        mainURL = "https://raw.githubusercontent.com/deyde22/DeydeHere-MAIN-SC/refs/heads/main/PTHT%20V2.1%20NEWs",
+        whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PTHT%202.1.txt",
+        useRedirect = true
+    },
+    {
+        name = "COOKING SCRIPT",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/AkuMahPemula%5BCOOK%5D.lua",
+        useRedirect = false
+    },
+    {
+        name = "WTW MOVE",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/AkuMahMasihPemula%5BWTW%5D.lua",
+        useRedirect = false
+    },
+    {
+        name = "SPTHT",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/SPTHT-GG.lua",
+        useRedirect = false
+    },
+    {
+        name = "SB PROXY",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/SB-kayanya.luau",
+        useRedirect = false
+    },
+    {
+        name = "PROXY IKAN",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/ProxyIkan.txt",
+        useRedirect = false
+    },
+    {
+        name = "PUSH DAILY",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/GUILDLODER.lua.txt",
+        useRedirect = false
+    },
+    {
+        name = "GRINDER SC",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/GRINDERSCMAHAL.lua",
+        useRedirect = false
+    },
+    { 
+        name = "PUT PLAT",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PutPlat.lua%20(2).txt",
+        useRedirect = false
+    },
+    {
+        name = "ROTASI SCRIPT",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/Holidays.lua",
+        useRedirect = false
+    },
+    {
+        name = "PNB V3 (ENCRYPTED)",
+        mainURL = "https://raw.githubusercontent.com/YOUR_REPO/YOUR_PATH/PNB v3_enc",
+        useRedirect = false,
+        isEncrypted = true,
+        encryptedFileName = "PNB v3_enc"
+    }
+}
+
+local loader_hook_name = "SANG_PENAKLUK_MATAHARI_LOADER"
+local tempFiles = {}
+
+local function cleanupTempFiles()
+    for _, filePath in ipairs(tempFiles) do
+        pcall(function()
+            RemoveFile(filePath)
+            LogToConsole("Cleaned up: " .. filePath)
+        end)
+    end
+    tempFiles = {}
+end
+
+local function setStatus(msg, color)
+    statusMessage = msg
+    statusColor = color or ImVec4(1, 1, 1, 1)
+    LogToConsole(msg)
+end
+
+local function setupHook(whitelistURL)
+    local oldMakeRequest = MakeRequest
+    function MakeRequest(url, ...)
+        if type(url) == "string" and (url:find("deyde22/Deydehere%-VIP%-SC") or url:find("deyde22%%2FDeydehere%-VIP%-SC")) then
+            LogToConsole("Whitelist redirected to custom URL")
+            return oldMakeRequest(whitelistURL, ...)
+        end
+        return oldMakeRequest(url, ...)
+    end
+end
+
+local function loadScript(scriptIndex)
+    if isLoading then return end
+    isLoading = true
+    RemoveHook(loader_hook_name)
+    
+    RunThread(function()
+        local script = scripts[scriptIndex]
+        setStatus("Loading " .. script.name .. "...", ImVec4(1, 1, 0, 1))
+        
+        ConfigPath = script.configPath
+        Android, Windows = true, true
+        
+        -- Handle encrypted files
+        if script.isEncrypted then
+            setStatus("Downloading encrypted file...", ImVec4(1, 1, 0, 1))
+            
+            local res = MakeRequest(script.mainURL, "GET", nil, nil, 10000)
+            if not res or not res.content then
+                setStatus("Download failed!", ImVec4(1, 0, 0, 1))
+                isLoading = false
+                return
+            end
+            
+            -- Save to temp file
+            local tempPath = script.encryptedFileName
+            WriteFile(tempPath, res.content)
+            table.insert(tempFiles, tempPath)  -- Track for cleanup
+            
+            -- Load encrypted file
+            local ok, err = pcall(function()
+                LoadEncryptedFile(script.encryptedFileName)
+            end)
+            
+            if ok then
+                setStatus("Encrypted script loaded!", ImVec4(0, 1, 0, 1))
+                Sleep(1000)
+                cleanupTempFiles()  -- Delete after load
+                Sleep(1000)
+                showMenu = false
+            else
+                setStatus("Load failed: " .. tostring(err), ImVec4(1, 0, 0, 1))
+            end
+            isLoading = false
+            return
+        end
+        
+        if script.useRedirect then
+            setupHook(script.whitelistNew)
+        end
+        
+        local res = MakeRequest(script.mainURL, "GET", nil, nil, 10000)
+        
+        if not res then
+            setStatus("Connection failed!", ImVec4(1, 0, 0, 1))
+            isLoading = false
+            return
+        end
+        
+        LogToConsole("HTTP status: " .. tostring(res.status) .. "  err: " .. tostring(res.error))
+        
+        local content = res.content or res
+        if not content or #tostring(content) == 0 then
+            setStatus("Empty content received!", ImVec4(1, 0, 0, 1))
+            isLoading = false
+            return
+        end
+        
+        if script.useRedirect then
+            content = tostring(content):gsub("deyde22/Deydehere%-VIP%-SC", "PrivateStranger/Justathing")
+            content = tostring(content):gsub("deyde22%%2FDeydehere%-VIP%-SC", "PrivateStranger%%2FJustathing")
+            
+            if content:find("PrivateStranger") then
+                LogToConsole("Link replacement successful")
+            end
+        else
+            LogToConsole("Direct load - no redirection")
+        end
+        
+        local f, compileErr = load(content)
+        if not f then
+            setStatus("Compile error: " .. tostring(compileErr), ImVec4(1, 0, 0, 1))
+            isLoading = false
+            return
+        end
+        
+        local ok, runtimeErr = pcall(f)
+        if not ok then
+            setStatus("Runtime error: " .. tostring(runtimeErr), ImVec4(1, 0, 0, 1))
+            isLoading = false
+        else
+            setStatus("Script loaded successfully!", ImVec4(0, 1, 0, 1))
+            Sleep(2000)
+            showMenu = false
+        end
+        
+        isLoading = false
+    end)
+end
+
+function LoaderOnDraw()
+    if not showMenu then return end
+    
+    ImGui.SetNextWindowSize(ImVec2(420, 400), ImGui.Cond.FirstUseEver)
+    local flags = ImGui.WindowFlags.NoCollapse + ImGui.WindowFlags.NoResize
+    ImGui.Begin("SANG PENAKLUK MATAHARI", flags)
+    
+    -- Header
+    ImGui.TextColored(ImVec4(1, 0.8, 0, 1), "UNIVERSAL LOADER V2.2")
+    ImGui.Separator()
+    ImGui.Spacing()
+    
+    -- Script Selection
+    ImGui.Text("Select Script:")
+    ImGui.Spacing()
+    
+    -- Scrollable region for scripts
+    ImGui.BeginChild("ScriptList", ImVec2(0, 200), true)
+    for i, script in ipairs(scripts) do
+        if ImGui.Selectable(script.name, selectedScript == i) then
+            selectedScript = i
+            setStatus("Selected: " .. script.name, ImVec4(0.7, 0.7, 1, 1))
+        end
+    end
+    ImGui.EndChild()
+    
+    ImGui.Spacing()
+    ImGui.Separator()
+    ImGui.Spacing()
+    
+    -- Status message
+    if #statusMessage > 0 then
+        ImGui.TextColored(statusColor, statusMessage)
+        ImGui.Spacing()
+    end
+    
+    -- Start button
+    local script_to_run = selectedScript > 0 and scripts[selectedScript]
+    local buttonEnabled = script_to_run and not isLoading
+    
+    if not buttonEnabled then
+        ImGui.PushStyleColor(ImGui.Col.Button, ImVec4(0.3, 0.3, 0.3, 1.0))
+        ImGui.PushStyleColor(ImGui.Col.ButtonHovered, ImVec4(0.3, 0.3, 0.3, 1.0))
+        ImGui.PushStyleColor(ImGui.Col.ButtonActive, ImVec4(0.3, 0.3, 0.3, 1.0))
+    else
+        ImGui.PushStyleColor(ImGui.Col.Button, ImVec4(0, 0.5, 0, 1.0))
+        ImGui.PushStyleColor(ImGui.Col.ButtonHovered, ImVec4(0, 0.7, 0, 1.0))
+        ImGui.PushStyleColor(ImGui.Col.ButtonActive, ImVec4(0, 0.4, 0, 1.0))
+    end
+    
+    local buttonText = isLoading and "LOADING..." or "START SCRIPT"
+    if ImGui.Button(buttonText, ImVec2(ImGui.GetContentRegionAvail().x, 40)) and buttonEnabled then
+        loadScript(selectedScript)
+    end
+    ImGui.PopStyleColor(3)
+    
+    -- Close button
+    ImGui.Spacing()
+    if ImGui.Button("CLOSE LOADER", ImVec2(ImGui.GetContentRegionAvail().x, 30)) then
+        showMenu = false
+    end
+    
+    ImGui.Spacing()
+    ImGui.Separator()
+    ImGui.TextColored(ImVec4(0.5, 0.5, 0.5, 1.0), "Custom Whitelist Loader v2.2")
+    
+    ImGui.End()
+end
+
+AddHook("OnDraw", loader_hook_name, LoaderOnDraw)
+LogToConsole("SANG PENAKLUK MATAHARI - Loader Ready v2.2")
