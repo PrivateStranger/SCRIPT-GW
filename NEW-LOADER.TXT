@@ -135,11 +135,20 @@ local function loadScript(scriptIndex)
             setStatus("Downloading encrypted file...", ImVec4(1, 1, 0, 1))
             
             local res = MakeRequest(script.mainURL, "GET", nil, nil, 10000)
-            if not res or not res.content then
+            if not res then
                 setStatus("Download failed!", ImVec4(1, 0, 0, 1))
                 isLoading = false
                 return
             end
+            
+            local content = res.content or res
+            if not content or #tostring(content) == 0 then
+                setStatus("Empty content!", ImVec4(1, 0, 0, 1))
+                isLoading = false
+                return
+            end
+            
+            LogToConsole("Downloaded " .. #content .. " bytes")
             
             -- Save to temp file
             local tempPath = script.encryptedFileName
@@ -150,9 +159,11 @@ local function loadScript(scriptIndex)
                 return
             end
             
-            file:write(res.content)
+            file:write(content)
             file:close()
             table.insert(tempFiles, tempPath)
+            
+            LogToConsole("File saved: " .. tempPath)
             
             -- Load encrypted file
             local ok, err = pcall(function()
@@ -167,6 +178,7 @@ local function loadScript(scriptIndex)
                 showMenu = false
             else
                 setStatus("Load failed: " .. tostring(err), ImVec4(1, 0, 0, 1))
+                LogToConsole("LoadEncryptedFile error: " .. tostring(err))
             end
             isLoading = false
             return
