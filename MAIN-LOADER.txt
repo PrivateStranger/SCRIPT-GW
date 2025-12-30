@@ -66,6 +66,11 @@ local scripts = {
         name = "ROTASI SCRIPT",
         mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/Holidays.lua",
         useRedirect = false
+    },
+    { 
+        name = "SPAM SCRIPT",
+        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/spam%2Bafk%2Bimgui",
+        useRedireft = false
     }
 }
 
