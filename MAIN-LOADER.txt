@@ -11,14 +11,14 @@ local scripts = {
     {
         name = "PNB BOTHAX V2.1",
         configPath = "PNB-SETTING.json",
-        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/main/MAIN-PNB-SCRIPTS-V2.bin.txt",
+        mainURL = "https://raw.githubusercontent.com/dederikap/The-sc-2/refs/heads/main/PNB v2",
         whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PNB%202.1.txt",
         useRedirect = true
     },
     {
         name = "PTHT BOTHAX V2.1",
         configPath = "PTHT-SETTING.json",
-        mainURL = "https://raw.githubusercontent.com/PrivateStranger/Justathing/main/MAIN-PTHT-SCRIPTS-V2.bin.txt",
+        mainURL = "https://raw.githubusercontent.com/dederikap/The-sc-4/refs/heads/main/PTHT v2",
         whitelistNew = "https://raw.githubusercontent.com/PrivateStranger/Justathing/refs/heads/main/PTHT%202.1.txt",
         useRedirect = true
     },
